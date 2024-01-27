@@ -6,10 +6,10 @@ from snake import obstacleLeft
 from snake import obstacleRight
 from snake import obstacleUp
 from snake import obstacleDown
+from snake import screen
 
 
 running = True
-screen = pygame.display.set_mode((1000, 600))
 clock = pygame.time.Clock()
 
 while running:

@@ -4,6 +4,7 @@ import random
 sizeGained = 5
 sizeLost = 5
 
+screen = pygame.display.set_mode((1000, 600))
 
 def changeDirection(object):
     if object.direction == "LEFT":
@@ -43,15 +44,23 @@ class Food:
 
 
 class Snake:
+
     def __init__(self, x, y, width, height, speed, direction):
         self.speed = speed
         self.direction = direction
         self.rect = pygame.Rect(x, y, width, height)
+        self.tail = []
+        self.numberOfSegments = 0
 
     def eat(self):
-        if self.rect.colliderect(myfood.rect):
-            self.rect.width += sizeGained
-            self.rect.height += sizeGained
+        if self.rect.colliderect(myfood):
+            self.tail.append(pygame.Rect(20, 20, 20, 20))
+            self.numberOfSegments += 1
+        if self.numberOfSegments > 0:
+            counter = 0
+            while counter < self.numberOfSegments:
+                pygame.draw.rect(screen, (255, 0, 0), self.tail[counter])
+                counter += 1
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -73,13 +82,34 @@ class Snake:
         elif self.direction == "DOWN":
             self.rect.y += self.speed
 
+        if self.numberOfSegments > 0:
+            if self.tail[0].x < self.rect.x + 30:
+                self.tail[0].x += self.speed
+            if self.tail[0].x > self.rect.x + 30:
+                self.tail[0].x -= self.speed
+            if self.tail[0].y < self.rect.y + 30:
+                self.tail[0].y += self.speed
+            if self.tail[0].y > self.rect.y + 30:
+                self.tail[0].y -= self.speed
+            counter = 1
+            while counter < self.numberOfSegments:
+
+                if self.tail[counter].x < self.tail[counter - 1].x + 20:
+                    self.tail[counter].x += self.speed
+                if self.tail[counter].x > self.tail[counter - 1].x + 20:
+                    self.tail[counter].x -= self.speed
+                if self.tail[counter].y < self.tail[counter - 1].y + 20:
+                    self.tail[counter].y += self.speed
+                if self.tail[counter].y > self.tail[counter - 1].y + 20:
+                    self.tail[counter].y -= self.speed
+                counter += 1
+
     def collisions(self):
         counter = 0
         while counter < numberOfObstacles:
             if self.rect.colliderect(Obstacle.instances[counter].rect):
                 changeDirection(self)
-                self.rect.width -= sizeLost
-                self.rect.height -= sizeLost
+                self.numberOfSegments -= 1
             counter += 1
         if self.rect.width < 15:
             self.rect.width = 15
