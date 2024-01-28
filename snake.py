@@ -6,6 +6,16 @@ sizeLost = 5
 
 screen = pygame.display.set_mode((1000, 600))
 
+def follow(object, objectFollowed, speed):
+    if object.x < objectFollowed.x + 20:
+        object.x += speed
+    if object.x > objectFollowed.x + 20:
+        object.x -= speed
+    if object.y < objectFollowed.y + 20:
+        object.y += speed
+    if object.y > objectFollowed.y + 20:
+        object.y -= speed
+
 def changeDirection(object):
     if object.direction == "LEFT":
         object.direction = "RIGHT"
@@ -54,7 +64,8 @@ class Snake:
 
     def eat(self):
         if self.rect.colliderect(myfood):
-            self.tail.append(pygame.Rect(20, 20, 20, 20))
+            self.tail.append(pygame.Rect(self.rect.x, self.rect.y, 20, 20))
+            self.tail.append(pygame.Rect(self.tail[-1].x, self.tail[-1].y, 20, 20))
             self.numberOfSegments += 1
         if self.numberOfSegments > 0:
             counter = 0
@@ -83,26 +94,24 @@ class Snake:
             self.rect.y += self.speed
 
         if self.numberOfSegments > 0:
-            if self.tail[0].x < self.rect.x + 30:
-                self.tail[0].x += self.speed
-            if self.tail[0].x > self.rect.x + 30:
-                self.tail[0].x -= self.speed
-            if self.tail[0].y < self.rect.y + 30:
-                self.tail[0].y += self.speed
-            if self.tail[0].y > self.rect.y + 30:
-                self.tail[0].y -= self.speed
+            follow(self.tail[0], self.rect, self.speed)
             counter = 1
             while counter < self.numberOfSegments:
-
-                if self.tail[counter].x < self.tail[counter - 1].x + 20:
-                    self.tail[counter].x += self.speed
-                if self.tail[counter].x > self.tail[counter - 1].x + 20:
-                    self.tail[counter].x -= self.speed
-                if self.tail[counter].y < self.tail[counter - 1].y + 20:
-                    self.tail[counter].y += self.speed
-                if self.tail[counter].y > self.tail[counter - 1].y + 20:
-                    self.tail[counter].y -= self.speed
+                follow(self.tail[counter], self.tail[counter - 1], self.speed)
                 counter += 1
+
+        # self.update_tail()
+
+    # def update_tail(self):
+    #     if self.numberOfSegments > 0:
+    #         # Move the last segment to the position of the snake's head
+    #         self.tail[-1].topleft = (self.rect.x, self.rect.y)
+    #         # Iterate through the segments starting from the second to last
+    #         for i in range(self.numberOfSegments - 1, 0, -1):
+    #             # Move each segment to the position of the segment in front of it
+    #             self.tail[i].topleft = (self.tail[i - 1].x, self.tail[i - 1].y)
+    #         # Move the first segment to the previous position of the snake's head
+    #         self.tail[0].topleft = (self.rect.x, self.rect.y)
 
     def collisions(self):
         counter = 0
@@ -116,5 +125,5 @@ class Snake:
             self.rect.height = 15
 
 
-mysnake = Snake(100, 100, 30, 30, 2, "RIGHT")
+mysnake = Snake(100, 100, 20, 20, 2, "RIGHT")
 myfood = Food(50, 50, 20, 20)
